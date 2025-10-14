@@ -1,0 +1,58 @@
+# .gitignore
+
+# Flutter
+.dart_tool/
+.ios/
+.build/
+build/
+.pub/
+pubspec.lock
+.packages
+.fvm/
+
+# Android
+android/.gradle
+android/gradle
+android/build
+android/app/build
+android/local.properties
+android/key.properties
+
+# iOS
+ios/.symlinks
+ios/Pods
+ios/build
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcodeproj/project.xcworkspace/xcuserdata
+ios/Runner.xcodeproj/xcuserdata
+ios/Runner.xcworkspace/xcuserdata
+ios/Runner.xcworkspace/contents.xcworkspacedata
+ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.log.*
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Secrets
+**/secrets/**
+**/config/**
