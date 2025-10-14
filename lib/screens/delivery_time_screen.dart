@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/selected_dishes_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'order_confirmation_screen.dart';
 
 class DeliveryTimeScreen extends StatelessWidget {
@@ -28,12 +28,12 @@ class DeliveryTimeScreen extends StatelessWidget {
         body: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+            color: hexColor('#885F3A').withOpacity(0.1),
           ),
           child: Center(
             child: Text(
               'Дата не выбрана',
-              style: TextStyle(fontSize: 20, color: primaryColor), // наш цвет текста
+              style: TextStyle(fontSize: 20, color: primaryColor),
             ),
           ),
         ),
@@ -56,7 +56,7 @@ class DeliveryTimeScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,13 +75,13 @@ class DeliveryTimeScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                   decoration: BoxDecoration(
-                    color: primaryColor, // наш цвет фона
+                    color: primaryColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     'Изменить',
                     style: TextStyle(
-                      color: textOnPrimary, // наш цвет текста
+                      color: textOnPrimary,
                       fontSize: 16,
                     ),
                   ),
@@ -93,9 +93,9 @@ class DeliveryTimeScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: buttonBg, // наш цвет фона
+                color: buttonBg,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: primaryColor), // наш цвет границы
+                border: Border.all(color: primaryColor),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +158,6 @@ class DeliveryTimeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // Кнопка "Согласовать" теперь центрирована
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -166,19 +165,18 @@ class DeliveryTimeScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Заказ согласован')),
                   );
-                  // ✅ Переход на OrderConfirmationScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => OrderConfirmationScreen(
-                        totalPrice: 116.90, // Пример цены
+                        totalPrice: 116.90,
                       ),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor, // наш цвет фона кнопки
-                  foregroundColor: textOnPrimary, // цвет текста на кнопке
+                  backgroundColor: primaryColor,
+                  foregroundColor: textOnPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
                 child: const Text('Согласовать', style: TextStyle(color: Colors.white)),

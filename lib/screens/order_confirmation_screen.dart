@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../utils/time_input_formatter.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
   final double totalPrice;
@@ -40,14 +40,13 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Цена
               Row(
                 children: [
                   Text(
@@ -63,7 +62,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Адрес
               const Text(
                 'Адрес',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -73,13 +71,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                 controller: _addressController,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Время
               const Text(
                 'Время',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -88,18 +85,17 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               TextField(
                 controller: _timeController,
                 inputFormatters: [
-                  TimeInputFormatter(), // ✅ Маска времени
+                  TimeInputFormatter(),
                 ],
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 30),
 
-              // Чекбоксы
               CheckboxListTile(
                 title: const Text('Что-то про аккаунт'),
                 value: _accountAgreement,
@@ -130,7 +126,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
               const SizedBox(height: 40),
 
-              // Кнопка "Оплатить" — под чекбоксами
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
@@ -158,11 +153,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Заказ оформлен')),
                     );
-                    Navigator.pop(context); // Закрываем экран
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor, // наш цвет фона кнопки
-                    foregroundColor: textOnPrimary, // цвет текста на кнопке
+                    backgroundColor: primaryColor,
+                    foregroundColor: textOnPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
                   child: const Text('Оплатить', style: TextStyle(color: Colors.white)),

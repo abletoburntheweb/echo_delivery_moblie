@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/phone_input_formatter.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -27,7 +27,7 @@ class RegisterScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -35,19 +35,17 @@ class RegisterScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
 
-              // Поле: Название фирмы
               TextField(
                 controller: companyController,
                 decoration: InputDecoration(
                   labelText: 'Название фирмы',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Поле: Телефон (с маской)
               TextField(
                 controller: phoneController,
                 inputFormatters: [
@@ -58,7 +56,7 @@ class RegisterScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Телефон',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
@@ -70,7 +68,7 @@ class RegisterScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Адрес',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -82,36 +80,32 @@ class RegisterScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Пароль',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 30),
 
-              // Кнопка: Зарегистрироваться
               ElevatedButton(
                 onPressed: () {
-                  // TODO: добавить логику регистрации
                   print('Фирма: ${companyController.text}');
                   print('Телефон: ${phoneController.text}');
                   print('Адрес: ${addressController.text}');
                   print('Пароль: ${passwordController.text}');
-                  // Переход на экран логина
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor, // наш цвет фона кнопки
-                  foregroundColor: textOnPrimary, // цвет текста на кнопке
+                  backgroundColor: primaryColor,
+                  foregroundColor: textOnPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
                 child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(height: 10),
 
-              // Ссылка: Уже есть аккаунт?
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -121,7 +115,7 @@ class RegisterScreen extends StatelessWidget {
                 },
                 child: Text(
                   'Уже есть аккаунт?',
-                  style: TextStyle(color: primaryColor), // наш цвет текста
+                  style: TextStyle(color: primaryColor),
                 ),
               ),
             ],

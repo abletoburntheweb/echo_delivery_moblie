@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'profile_screen.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 
 class FAQScreen extends StatelessWidget {
   const FAQScreen({super.key});
@@ -13,8 +13,8 @@ class FAQScreen extends StatelessWidget {
       builder: (context) => Scaffold(
         appBar: buildCommonAppBar(
           title: 'ECHO corp',
-          titleColor: textOnPrimary, // наш цвет текста
-          backgroundColor: primaryColor, // наш цвет фона
+          titleColor: textOnPrimary,
+          backgroundColor: primaryColor,
           showProfileButton: true,
           onProfilePressed: () => Navigator.push(
             context,
@@ -52,7 +52,7 @@ class FAQScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: primaryColor, // наш цвет фона
+                  color: primaryColor,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -91,14 +91,14 @@ class FAQScreen extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: primaryColor, // наш цвет фона
+            color: primaryColor,
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Text(
             question,
             style: TextStyle(
-              color: textOnPrimary, // наш цвет текста
+              color: textOnPrimary,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -108,7 +108,7 @@ class FAQScreen extends StatelessWidget {
         Text(
           answer,
           style: TextStyle(
-            color: primaryColor, // наш цвет текста
+            color: primaryColor,
             fontSize: 16,
           ),
         ),

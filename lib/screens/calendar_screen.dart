@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'FAQ_screen.dart';
 import 'profile_screen.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -23,8 +23,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       builder: (context) => Scaffold(
         appBar: buildCommonAppBar(
           title: 'ECHO corp',
-          titleColor: textOnPrimary, // используем наш цвет
-          backgroundColor: primaryColor, // используем наш цвет
+          titleColor: textOnPrimary,
+          backgroundColor: primaryColor,
           showProfileButton: true,
           onProfilePressed: () => Navigator.push(
             context,
@@ -46,14 +46,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
               Text(
                 DateFormat('MMMM yyyy').format(DateTime.now()).toUpperCase(),
-                style: TextStyle(fontSize: 18, color: primaryColor, fontWeight: FontWeight.w500), // наш цвет
+                style: TextStyle(fontSize: 18, color: primaryColor, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 10),
 
               Container(
                 height: 300,
                 decoration: BoxDecoration(
-                  color: primaryColor, // наш цвет
+                  color: primaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 padding: const EdgeInsets.all(15),
@@ -83,8 +83,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: buttonBg, // наш цвет
-                        foregroundColor: buttonText, // наш цвет
+                        backgroundColor: buttonBg,
+                        foregroundColor: buttonText,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -110,8 +110,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: primaryColor, // наш цвет
-                      foregroundColor: textOnPrimary, // наш цвет
+                      backgroundColor: primaryColor,
+                      foregroundColor: textOnPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -130,20 +130,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
-
-  // Вспомогательный метод для создания заголовков дней недели
+  
   Widget _buildWeekdayHeader() {
     const weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: weekdays.map((day) =>
-          Text(day, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)) // можно заменить
+          Text(day, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
       ).toList(),
     );
   }
 
-  // Вспомогательный метод для создания сетки дат
   Widget _buildCalendarGrid(BuildContext context) {
     final today = DateTime.now();
     final dates = List.generate(14, (index) => today.add(Duration(days: index)));
@@ -187,8 +185,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isSelected ? buttonBg : (isToday ? buttonBg : Colors.transparent), // наш цвет
-              border: Border.all(color: textOnPrimary), // наш цвет
+              color: isSelected ? buttonBg : (isToday ? buttonBg : Colors.transparent),
+              border: Border.all(color: textOnPrimary),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Center(
@@ -196,10 +194,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 '$day',
                 style: TextStyle(
                   color: isSelected
-                      ? textOnSecondary // наш цвет
+                      ? textOnSecondary
                       : isToday && !isSelected
-                      ? accentColor // красный
-                      : textOnPrimary, // наш цвет
+                      ? accentColor
+                      : textOnPrimary,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   fontSize: 20,
                 ),

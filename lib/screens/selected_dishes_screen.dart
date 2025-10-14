@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'menu_screen.dart';
 import 'delivery_time_screen.dart';
 
@@ -34,7 +34,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,13 +61,13 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                   decoration: BoxDecoration(
-                    color: primaryColor, // наш цвет фона
+                    color: primaryColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     'Время',
                     style: TextStyle(
-                      color: textOnPrimary, // наш цвет текста
+                      color: textOnPrimary,
                       fontSize: 16,
                     ),
                   ),
@@ -82,7 +82,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                   'Пока здесь пусто',
                   style: TextStyle(
                     fontSize: 20,
-                    color: primaryColor.withOpacity(0.6), // наш цвет с прозрачностью
+                    color: primaryColor.withOpacity(0.6),
                   ),
                 ),
               ),
@@ -99,8 +99,8 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                     MaterialPageRoute(builder: (context) => const MenuScreen()),
                   );
                 },
-                backgroundColor: buttonBg, // наш цвет фона кнопки
-                child: Icon(Icons.add, color: primaryColor), // наш цвет иконки
+                backgroundColor: buttonBg,
+                child: Icon(Icons.add, color: primaryColor),
               ),
             ),
           ],

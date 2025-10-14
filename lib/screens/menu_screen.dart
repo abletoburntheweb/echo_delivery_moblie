@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'dish_detail_screen.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -24,31 +24,30 @@ class MenuScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Поисковая строка
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
               decoration: BoxDecoration(
-                color: buttonBg, // наш цвет фона
+                color: buttonBg,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: primaryColor), // наш цвет границы
+                border: Border.all(color: primaryColor),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: primaryColor), // наш цвет иконки
+                  Icon(Icons.search, color: primaryColor),
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Поиск блюд...',
                         border: InputBorder.none,
-                        hintStyle: TextStyle(color: primaryColor.withOpacity(0.6)), // наш цвет с прозрачностью
+                        hintStyle: TextStyle(color: primaryColor.withOpacity(0.6)),
                       ),
-                      style: TextStyle(color: primaryColor), // наш цвет текста
+                      style: TextStyle(color: primaryColor),
                     ),
                   ),
                 ],
@@ -56,7 +55,6 @@ class MenuScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Список блюд
             Expanded(
               child: ListView(
                 children: [
@@ -92,7 +90,6 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  // Вспомогательный метод для создания элемента блюда
   Widget _buildMenuItem({
     required BuildContext context,
     required String name,
@@ -114,19 +111,18 @@ class MenuScreen extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: buttonBg, // наш цвет фона
+          color: buttonBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: primaryColor), // наш цвет границы
+          border: Border.all(color: primaryColor),
         ),
         padding: const EdgeInsets.all(10),
         child: Row(
           children: [
-            // Серый прямоугольник вместо изображения
             Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.grey[300], // можно оставить серый, или заменить на наш
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -135,7 +131,7 @@ class MenuScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[600], // можно оставить или заменить
+                    color: Colors.grey[600],
                   ),
                 ),
               ),
@@ -152,7 +148,7 @@ class MenuScreen extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     price,
-                    style: TextStyle(fontSize: 16, color: primaryColor), // наш цвет текста
+                    style: TextStyle(fontSize: 16, color: primaryColor),
                   ),
                 ],
               ),
