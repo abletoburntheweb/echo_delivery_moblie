@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'calendar_screen.dart';
 import 'register_screen.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -19,7 +19,7 @@ class LoginScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: Center(
           child: Column(
@@ -31,7 +31,7 @@ class LoginScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Логин',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -42,7 +42,7 @@ class LoginScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Пароль',
                   filled: true,
-                  fillColor: buttonBg, // наш цвет фона
+                  fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -56,8 +56,8 @@ class LoginScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor, // наш цвет фона кнопки
-                  foregroundColor: textOnPrimary, // цвет текста на кнопке
+                  backgroundColor: primaryColor,
+                  foregroundColor: textOnPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
                 child: const Text('Войти', style: TextStyle(color: Colors.white)),
@@ -73,7 +73,7 @@ class LoginScreen extends StatelessWidget {
                 },
                 child: Text(
                   'Регистрация',
-                  style: TextStyle(color: primaryColor), // наш цвет текста
+                  style: TextStyle(color: primaryColor),
                 ),
               ),
             ],

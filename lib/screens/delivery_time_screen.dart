@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/selected_dishes_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/common_app_bar.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'order_confirmation_screen.dart';
+import '../models/dish.dart';
 
 class DeliveryTimeScreen extends StatelessWidget {
   final DateTime? selectedDate;
+  final List<Dish> selectedDishes;
 
   const DeliveryTimeScreen({
-    super.key,
+    Key? key,
     this.selectedDate,
-  });
+    required this.selectedDishes,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +31,23 @@ class DeliveryTimeScreen extends StatelessWidget {
         body: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+            color: hexColor('#885F3A').withOpacity(0.1),
           ),
           child: Center(
             child: Text(
               'Дата не выбрана',
-              style: TextStyle(fontSize: 20, color: primaryColor), // наш цвет текста
+              style: TextStyle(fontSize: 20, color: primaryColor),
             ),
           ),
         ),
       );
     }
 
-    final dishName = 'Блюдо №1';
-    final quantity = 50;
-    final days = 30;
-    final price = 116.90;
+    double totalPrice = 0.0;
+    for (var dish in selectedDishes) {
+      double unitPrice = _parsePrice(dish.price);
+      totalPrice += unitPrice * dish.quantity;
+    }
 
     return Scaffold(
       appBar: buildCommonAppBar(
@@ -56,7 +60,7 @@ class DeliveryTimeScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,23 +69,18 @@ class DeliveryTimeScreen extends StatelessWidget {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SelectedDishesScreen(),
-                    ),
-                  );
+                  Navigator.pop(context, selectedDishes);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                   decoration: BoxDecoration(
-                    color: primaryColor, // наш цвет фона
+                    color: primaryColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     'Изменить',
                     style: TextStyle(
-                      color: textOnPrimary, // наш цвет текста
+                      color: textOnPrimary,
                       fontSize: 16,
                     ),
                   ),
@@ -90,57 +89,80 @@ class DeliveryTimeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: buttonBg, // наш цвет фона
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: primaryColor), // наш цвет границы
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: ListView(
                 children: [
-                  Center(
-                    child: Text(
-                      DateFormat('dd.MM.yyyy').format(selectedDate!),
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: buttonBg,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: primaryColor),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          dishName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            DateFormat('dd.MM.yyyy').format(selectedDate!),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      Text(
-                        '$quantity штук',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '$days дней',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 30),
+                        const SizedBox(height: 20),
+                        ...selectedDishes.map((dish) {
+                          double unitPrice = _parsePrice(dish.price);
+                          double itemTotalPrice = unitPrice * dish.quantity;
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${price.toStringAsFixed(2)} ₽',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: hexColor('#885F3A').withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        dish.name,
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        '30 дней',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${dish.quantity} штук',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      '${itemTotalPrice.toStringAsFixed(2)} ₽',
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 30),
 
             Row(
@@ -151,14 +173,13 @@ class DeliveryTimeScreen extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '${price.toStringAsFixed(2)} ₽',
+                  '${totalPrice.toStringAsFixed(2)} ₽',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: 40),
 
-            // Кнопка "Согласовать" теперь центрирована
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -166,19 +187,18 @@ class DeliveryTimeScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Заказ согласован')),
                   );
-                  // ✅ Переход на OrderConfirmationScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => OrderConfirmationScreen(
-                        totalPrice: 116.90, // Пример цены
+                        totalPrice: totalPrice,
                       ),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor, // наш цвет фона кнопки
-                  foregroundColor: textOnPrimary, // цвет текста на кнопке
+                  backgroundColor: primaryColor,
+                  foregroundColor: textOnPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
                 child: const Text('Согласовать', style: TextStyle(color: Colors.white)),
@@ -188,5 +208,15 @@ class DeliveryTimeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  double _parsePrice(String priceString) {
+    String numericPart = priceString.replaceAll(RegExp(r'[^0-9.]'), '');
+    try {
+      return double.parse(numericPart);
+    } catch (e) {
+      print('Ошибка при парсинге цены: $priceString');
+      return 0.0;
+    }
   }
 }

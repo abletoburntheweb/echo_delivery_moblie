@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/quantity_spinner.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
+import '../models/dish.dart';
 
 class DishDetailScreen extends StatefulWidget {
   final String name;
@@ -39,7 +40,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       body: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+          color: hexColor('#885F3A').withOpacity(0.1),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -49,7 +50,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300], // можно оставить серый, или заменить
+                  color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
@@ -58,7 +59,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[600], // можно оставить или заменить
+                      color: Colors.grey[600],
                     ),
                   ),
                 ),
@@ -83,14 +84,18 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                     flex: 3,
                     child: ElevatedButton(
                       onPressed: () {
-                        print('Добавлено: ${widget.name}, кол-во: $_quantity');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Добавлено: ${widget.name}, кол-во: $_quantity')),
+                        final selectedDish = Dish(
+                          name: widget.name,
+                          description: widget.description,
+                          price: widget.price,
+                          quantity: _quantity,
                         );
+
+                        Navigator.pop(context, selectedDish);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor, // наш цвет фона кнопки
-                        foregroundColor: textOnPrimary, // цвет текста на кнопке
+                        backgroundColor: primaryColor,
+                        foregroundColor: textOnPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       child: const Text('Добавить', style: TextStyle(color: Colors.white)),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/phone_input_formatter.dart';
-import '../utils/colors.dart'; // Подключаем
+import '../utils/colors.dart';
 import 'login_screen.dart';
 import 'agreement_screen.dart';
 
@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
         body: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: hexColor('#885F3A').withOpacity(0.1), // наш цвет с прозрачностью
+            color: hexColor('#885F3A').withOpacity(0.1),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -42,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Название фирмы',
                     filled: true,
-                    fillColor: buttonBg, // наш цвет фона
+                    fillColor: buttonBg,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -58,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Телефон',
                     filled: true,
-                    fillColor: buttonBg, // наш цвет фона
+                    fillColor: buttonBg,
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.phone,
@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Почта',
                     filled: true,
-                    fillColor: buttonBg, // наш цвет фона
+                    fillColor: buttonBg,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -82,7 +82,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Пароль',
                     filled: true,
-                    fillColor: buttonBg, // наш цвет фона
+                    fillColor: buttonBg,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -90,7 +90,6 @@ class ProfileScreen extends StatelessWidget {
 
                 TextButton(
                   onPressed: () {
-                    // ✅ Переход на AgreementScreen
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const AgreementScreen()),
@@ -100,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
                     'Договор/соглашение',
                     style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: primaryColor, // наш цвет текста
+                      color: primaryColor,
                     ),
                   ),
                 ),
@@ -114,8 +113,8 @@ class ProfileScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor, // наш цвет (например, красный)
-                    foregroundColor: textOnPrimary, // цвет текста на кнопке
+                    backgroundColor: accentColor,
+                    foregroundColor: textOnPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
                   child: const Text('Выйти', style: TextStyle(color: Colors.white)),
