@@ -4,12 +4,16 @@ import 'calendar_screen.dart';
 import 'register_screen.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/colors.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loginController = TextEditingController();
+    final passwordController = TextEditingController();
+
     return Scaffold(
       appBar: buildCommonAppBar(
         title: 'ECHO corp',
@@ -28,6 +32,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 40),
 
               TextField(
+                controller: loginController,
                 decoration: InputDecoration(
                   labelText: 'Логин',
                   filled: true,
@@ -38,6 +43,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               TextField(
+                controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Пароль',
@@ -49,11 +55,30 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const CalendarScreen()),
-                  );
+                onPressed: () async {
+                  final login = loginController.text;
+                  final password = passwordController.text;
+
+                  if (login.isEmpty || password.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Пожалуйста, введите логин и пароль.')),
+                    );
+                    return;
+                  }
+
+                  bool success = await AuthService.loginUser(login, password);
+
+                  if (success) {
+                    print('Вход успешен для: $login');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CalendarScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Неверный логин или пароль.')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,

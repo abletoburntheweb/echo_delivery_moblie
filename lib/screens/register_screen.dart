@@ -5,6 +5,7 @@ import '../widgets/common_app_bar.dart';
 import '../utils/phone_input_formatter.dart';
 import '../utils/colors.dart';
 import 'login_screen.dart';
+import '../services/auth_service.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -14,7 +15,7 @@ class RegisterScreen extends StatelessWidget {
     final loginController = TextEditingController();
     final companyController = TextEditingController();
     final phoneController = TextEditingController();
-    final addressController = TextEditingController();
+    final emailController = TextEditingController();
     final passwordController = TextEditingController();
 
     return Scaffold(
@@ -76,13 +77,14 @@ class RegisterScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               TextField(
-                controller: addressController,
+                controller: emailController,
                 decoration: InputDecoration(
-                  labelText: 'Адрес',
+                  labelText: 'Почта',
                   filled: true,
                   fillColor: buttonBg,
                   border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
 
@@ -99,16 +101,33 @@ class RegisterScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: () {
-                  print('Логин: ${loginController.text}');
-                  print('Фирма: ${companyController.text}');
-                  print('Телефон: ${phoneController.text}');
-                  print('Адрес: ${addressController.text}');
-                  print('Пароль: ${passwordController.text}');
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  );
+                onPressed: () async {
+                  final login = loginController.text;
+                  final password = passwordController.text;
+                  final company = companyController.text;
+                  final phone = phoneController.text;
+                  final email = emailController.text;
+
+                  if (login.isEmpty || password.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
+                    );
+                    return;
+                  }
+
+                  bool success = await AuthService.registerUser(login, password, company, phone, email);
+
+                  if (success) {
+                    print('Регистрация успешна для: $login');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Пользователь с таким логином уже существует.')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
