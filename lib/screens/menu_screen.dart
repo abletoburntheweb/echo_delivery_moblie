@@ -141,6 +141,7 @@ class _MenuScreenState extends State<MenuScreen> {
               name: dish.name,
               description: dish.description,
               price: dish.price,
+              imagePath: dish.imagePath,
             ),
           ),
         );
@@ -170,7 +171,24 @@ class _MenuScreenState extends State<MenuScreen> {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Center(
+              child: dish.imagePath != null
+                  ? Image.asset(
+                dish.imagePath!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Text(
+                      dish.name[0],
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  );
+                },
+              )
+                  : Center(
                 child: Text(
                   dish.name[0],
                   style: TextStyle(

@@ -13,13 +13,7 @@ class MenuService {
       List<dynamic> jsonList = json.decode(jsonString);
 
       List<Dish> dishes = jsonList.map((jsonItem) {
-
-        return Dish(
-          name: jsonItem['name'] as String,
-          description: jsonItem['description'] as String,
-          price: jsonItem['price'] as String,
-          quantity: 0, 
-        );
+        return Dish.fromJson(jsonItem);
       }).toList();
 
       return dishes;

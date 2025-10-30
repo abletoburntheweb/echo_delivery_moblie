@@ -11,6 +11,7 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loginController = TextEditingController();
     final companyController = TextEditingController();
     final phoneController = TextEditingController();
     final addressController = TextEditingController();
@@ -34,6 +35,17 @@ class RegisterScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
+
+              TextField(
+                controller: loginController,
+                decoration: InputDecoration(
+                  labelText: 'Логин',
+                  filled: true,
+                  fillColor: buttonBg,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
 
               TextField(
                 controller: companyController,
@@ -88,6 +100,7 @@ class RegisterScreen extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () {
+                  print('Логин: ${loginController.text}');
                   print('Фирма: ${companyController.text}');
                   print('Телефон: ${phoneController.text}');
                   print('Адрес: ${addressController.text}');

@@ -10,12 +10,14 @@ class DishDetailScreen extends StatefulWidget {
   final String name;
   final String description;
   final String price;
+  final String? imagePath;
 
   const DishDetailScreen({
     super.key,
     required this.name,
     required this.description,
     required this.price,
+    this.imagePath,
   });
 
   @override
@@ -52,8 +54,26 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey.shade400),
                 ),
-                child: Center(
+                child: widget.imagePath != null
+                    ? Image.asset(
+                  widget.imagePath!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        widget.name[0],
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    );
+                  },
+                )
+                    : Center(
                   child: Text(
                     widget.name[0],
                     style: TextStyle(
@@ -88,6 +108,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                           name: widget.name,
                           description: widget.description,
                           price: widget.price,
+                          imagePath: widget.imagePath,
                           quantity: _quantity,
                         );
 

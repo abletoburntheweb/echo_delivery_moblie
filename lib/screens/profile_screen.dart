@@ -12,6 +12,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loginController = TextEditingController();
     final companyController = TextEditingController();
     final phoneController = TextEditingController();
     final emailController = TextEditingController();
@@ -36,6 +37,17 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
+
+                TextField(
+                  controller: loginController,
+                  decoration: InputDecoration(
+                    labelText: 'Логин',
+                    filled: true,
+                    fillColor: buttonBg,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
                 TextField(
                   controller: companyController,
