@@ -53,75 +53,81 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildCommonAppBar(
-        title: 'ECHO corp',
-        showProfileButton: true,
-        onProfilePressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    return WillPopScope(
+      onWillPop: () async {
+        // Возврат результата при системной кнопке "назад"
+        Navigator.pop(context, _newlyAddedDish);
+        return false;
+      },
+      child: Scaffold(
+        appBar: buildCommonAppBar(
+          title: 'ECHO corp',
+          showProfileButton: true,
+          onProfilePressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          ),
+          showBackButton: true,
+          onBackPressed: () {
+            Navigator.pop(context, _newlyAddedDish);
+          },
         ),
-        showBackButton: true,
-        onBackPressed: () {
-          Navigator.pop(context, _newlyAddedDish);
-        },
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: hexColor('#885F3A').withOpacity(0.1),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-              decoration: BoxDecoration(
-                color: buttonBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: primaryColor),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Поиск блюд...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: primaryColor.withOpacity(0.6)),
+        body: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: hexColor('#885F3A').withOpacity(0.1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                decoration: BoxDecoration(
+                  color: buttonBg,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: primaryColor),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: primaryColor),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Поиск блюд...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: primaryColor.withOpacity(0.6)),
+                        ),
+                        style: TextStyle(color: primaryColor),
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
                       ),
-                      style: TextStyle(color: primaryColor),
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _filteredDishes.isEmpty
-                  ? const Center(child: Text('Блюд не найдено'))
-                  : ListView.builder(
-                itemCount: _filteredDishes.length,
-                itemBuilder: (context, index) {
-                  Dish dish = _filteredDishes[index];
-                  return _buildMenuItem(
-                    context: context,
-                    dish: dish,
-                  );
-                },
+              const SizedBox(height: 20),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _filteredDishes.isEmpty
+                    ? const Center(child: Text('Блюд не найдено'))
+                    : ListView.builder(
+                  itemCount: _filteredDishes.length,
+                  itemBuilder: (context, index) {
+                    Dish dish = _filteredDishes[index];
+                    return _buildMenuItem(
+                      context: context,
+                      dish: dish,
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -133,7 +139,6 @@ class _MenuScreenState extends State<MenuScreen> {
   }) {
     return GestureDetector(
       onTap: () async {
-
         final result = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -151,7 +156,11 @@ class _MenuScreenState extends State<MenuScreen> {
             _newlyAddedDish = result;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Блюдо "${result.name}" добавлено в корзину! Нажмите "назад", чтобы вернуться.')),
+            SnackBar(
+              content: Text(
+                'Блюдо "${result.name}" добавлено в корзину! Нажмите "назад", чтобы вернуться.',
+              ),
+            ),
           );
         }
       },
@@ -162,6 +171,7 @@ class _MenuScreenState extends State<MenuScreen> {
           border: Border.all(color: primaryColor),
         ),
         padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
             Container(

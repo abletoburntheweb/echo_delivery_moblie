@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/selected_dishes_screen.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
+import 'package:flutterprojects/screens/faq_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/colors.dart';
@@ -49,77 +50,100 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildCommonAppBar(
-        title: 'ECHO corp',
-        titleColor: textOnPrimary,
-        backgroundColor: primaryColor,
-        showProfileButton: true,
-        onProfilePressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    return WillPopScope(
+      onWillPop: () async {
+        // Блокируем системную кнопку назад
+        return false;
+      },
+      child: Scaffold(
+        appBar: buildCommonAppBar(
+          title: 'ECHO corp',
+          titleColor: textOnPrimary,
+          backgroundColor: primaryColor,
+          showProfileButton: true,
+          onProfilePressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          ),
+          showBackButton: false, // убираем стрелку назад
+          onBackPressed: () {}, // пустая функция
         ),
-        showBackButton: true,
-        onBackPressed: () => Navigator.pop(context),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  _buildWeekdayHeader(),
-                  const SizedBox(height: 10),
-                  Expanded(child: _buildCalendarGrid(context)),
-                  const SizedBox(height: 20),
-
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_selectedDate != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SelectedDishesScreen(
-                              selectedDate: _selectedDate!,
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Container(
+                height: 300,
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  children: [
+                    _buildWeekdayHeader(),
+                    const SizedBox(height: 10),
+                    Expanded(child: _buildCalendarGrid(context)),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_selectedDate != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SelectedDishesScreen(
+                                selectedDate: _selectedDate!,
+                              ),
                             ),
-                          ),
-                        ).then((_) => _loadOrderDates()); // обновляем даты после возврата
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Пожалуйста, выберите дату')),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonBg,
-                      foregroundColor: buttonText,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                          ).then((_) => _loadOrderDates()); // обновляем даты после возврата
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Пожалуйста, выберите дату')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonBg,
+                        foregroundColor: buttonText,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      child: const Text('Принять', style: TextStyle(fontSize: 18)),
                     ),
-                    child: const Text('Принять', style: TextStyle(fontSize: 18)),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              // Кнопка FAQ под календарём
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const FAQScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: textOnPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                ),
+                child: const Text('FAQ', style: TextStyle(fontSize: 18)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildWeekdayHeader() {
-    const weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+    final weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: weekdays
@@ -167,7 +191,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               color: isSelected
                   ? buttonBg
                   : hasOrder
-                  ? Colors.orangeAccent // подсветка дней с заказами
+                  ? Colors.orangeAccent
                   : Colors.transparent,
               border: Border.all(color: textOnPrimary),
               borderRadius: BorderRadius.circular(50),

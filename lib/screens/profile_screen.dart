@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
                 child: Text(
-                  'Договор/соглашение',
+                  'Персональное соглашение',
                   style: TextStyle(
                     decoration: TextDecoration.underline,
                     color: primaryColor,

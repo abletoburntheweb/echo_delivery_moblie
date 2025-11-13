@@ -183,7 +183,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             const SizedBox(height: 20),
 
             CheckboxListTile(
-              title: const Text('Вы соглашаетесь со всем'),
+              title: const Text('Я принимаю условия персонального соглашения'),
               value: _termsAgreement,
               onChanged: (value) => setState(() => _termsAgreement = value ?? false),
             ),
@@ -197,7 +197,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
-                child: const Text('Оплатить'),
+                child: const Text('Подвердить'),
               ),
             ),
           ],

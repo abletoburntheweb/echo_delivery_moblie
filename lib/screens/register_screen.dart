@@ -20,6 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final addressController = TextEditingController();
+  bool _acceptedPrivacy = false; // Флаг согласия на обработку данных
 
   @override
   void dispose() {
@@ -44,7 +45,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    // Проверка на пустые поля
     if (address.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
@@ -52,7 +52,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Проверка email
     if (!_isEmailValid(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Пожалуйста, введите корректный адрес почты.')),
@@ -60,8 +59,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Регистрация
-    bool success = await AuthService.registerUser(password, company, phone, email,  address: address);
+    if (!_acceptedPrivacy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Вы должны согласиться на обработку персональных данных.')),
+      );
+      return;
+    }
+
+    bool success = await AuthService.registerUser(password, company, phone, email, address: address);
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,8 +103,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-
-              // Название компании
               TextField(
                 controller: companyController,
                 decoration: InputDecoration(
@@ -110,8 +113,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Физический адрес
               TextField(
                 controller: addressController,
                 decoration: InputDecoration(
@@ -122,8 +123,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Телефон
               TextField(
                 controller: phoneController,
                 inputFormatters: [
@@ -140,8 +139,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 20),
-
-              // Email с валидацией
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -154,11 +151,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       : null,
                 ),
                 keyboardType: TextInputType.emailAddress,
-                onChanged: (_) => setState(() {}), // Обновляем UI при вводе
+                onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 20),
-
-              // Пароль
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -169,7 +164,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   border: const OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
+
+              // Чекбокс согласия на обработку данных
+              Row(
+                children: [
+                  Checkbox(
+                    value: _acceptedPrivacy,
+                    onChanged: (value) {
+                      setState(() {
+                        _acceptedPrivacy = value ?? false;
+                      });
+                    },
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Я согласен на обработку персональных данных',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
 
               ElevatedButton(
                 onPressed: _validateAndRegister,
@@ -181,7 +197,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(height: 10),
-
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacement(
