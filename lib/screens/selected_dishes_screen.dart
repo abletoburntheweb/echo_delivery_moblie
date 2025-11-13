@@ -4,8 +4,10 @@ import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/colors.dart';
 import 'menu_screen.dart';
-import 'delivery_time_screen.dart';
+import 'order_confirmation_screen.dart';
 import '../models/dish.dart';
+import '../services/auth_service.dart';
+import 'package:intl/intl.dart';
 
 class SelectedDishesScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -21,6 +23,21 @@ class SelectedDishesScreen extends StatefulWidget {
 
 class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
   List<Dish> _selectedDishes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectedDate != null) {
+      _loadSavedDishes();
+    }
+  }
+
+  Future<void> _loadSavedDishes() async {
+    final dishes = await AuthService.getDishesForDate(widget.selectedDate!);
+    setState(() {
+      _selectedDishes = dishes;
+    });
+  }
 
   void _addDish(Dish dish) {
     setState(() {
@@ -72,31 +89,31 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Кнопка "Подтвердить" — переходим сразу на OrderConfirmationScreen
             Align(
               alignment: Alignment.topRight,
               child: GestureDetector(
-                onTap: () async {
-                  if (widget.selectedDate != null) {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DeliveryTimeScreen(
-                          selectedDate: widget.selectedDate!,
-                          selectedDishes: _selectedDishes,
-                        ),
-                      ),
-                    );
-
-                    if (result != null && result is List<Dish>) {
-                      setState(() {
-                        _selectedDishes = result;
-                      });
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Дата не выбрана')),
-                    );
+                onTap: () {
+                  if (widget.selectedDate == null) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text('Дата не выбрана')));
+                    return;
                   }
+                  if (_selectedDishes.isEmpty) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text('Выберите хотя бы одно блюдо')));
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OrderConfirmationScreen(
+                        selectedDate: widget.selectedDate!,
+                        selectedDishes: _selectedDishes,
+                      ),
+                    ),
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
@@ -105,7 +122,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    'Время',
+                    'Подтвердить',
                     style: TextStyle(
                       color: textOnPrimary,
                       fontSize: 16,
@@ -148,9 +165,8 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                             icon: const Icon(Icons.add_circle_outline),
                             onPressed: () {
                               setState(() {
-                                _selectedDishes[index] = dish.copyWith(
-                                  quantity: dish.quantity + 1,
-                                );
+                                _selectedDishes[index] =
+                                    dish.copyWith(quantity: dish.quantity + 1);
                               });
                             },
                           ),
@@ -164,6 +180,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
 
             const SizedBox(height: 20),
 
+            // Плавающая кнопка добавления новых блюд
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(

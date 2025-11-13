@@ -7,17 +7,79 @@ import '../utils/colors.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final loginController = TextEditingController();
-    final companyController = TextEditingController();
-    final phoneController = TextEditingController();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
 
+class _RegisterScreenState extends State<RegisterScreen> {
+  final companyController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final addressController = TextEditingController();
+
+  @override
+  void dispose() {
+    companyController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  bool _isEmailValid(String email) {
+    return RegExp(
+      r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
+    ).hasMatch(email);
+  }
+
+  void _validateAndRegister() async {
+    final address = addressController.text.trim();
+    final company = companyController.text.trim();
+    final phone = phoneController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    // Проверка на пустые поля
+    if (address.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
+      );
+      return;
+    }
+
+    // Проверка email
+    if (!_isEmailValid(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, введите корректный адрес почты.')),
+      );
+      return;
+    }
+
+    // Регистрация
+    bool success = await AuthService.registerUser(password, company, phone, email,  address: address);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Регистрация успешна!')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пользователь с таким email уже существует.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildCommonAppBar(
         title: 'ECHO corp',
@@ -37,57 +99,66 @@ class RegisterScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
 
-              TextField(
-                controller: loginController,
-                decoration: InputDecoration(
-                  labelText: 'Логин',
-                  filled: true,
-                  fillColor: buttonBg,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-
+              // Название компании
               TextField(
                 controller: companyController,
                 decoration: InputDecoration(
                   labelText: 'Название фирмы',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
+              // Физический адрес
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(
+                  labelText: 'Адрес компании',
+                  filled: true,
+                  fillColor: buttonBg,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Телефон
               TextField(
                 controller: phoneController,
                 inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(11),
+                  LengthLimitingTextInputFormatter(18),
                   PhoneInputFormatter(),
                 ],
                 decoration: InputDecoration(
-                  labelText: 'Телефон',
+                  labelText: '+7 (___) ___-__-__',
+                  hintText: '+7 (___) ___-__-__',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 20),
 
+              // Email с валидацией
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Почта',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  errorText: emailController.text.isNotEmpty && !_isEmailValid(emailController.text)
+                      ? 'Некорректный адрес почты'
+                      : null,
                 ),
                 keyboardType: TextInputType.emailAddress,
+                onChanged: (_) => setState(() {}), // Обновляем UI при вводе
               ),
               const SizedBox(height: 20),
 
+              // Пароль
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -95,40 +166,13 @@ class RegisterScreen extends StatelessWidget {
                   labelText: 'Пароль',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: () async {
-                  final login = loginController.text;
-                  final password = passwordController.text;
-                  final company = companyController.text;
-                  final phone = phoneController.text;
-                  final email = emailController.text;
-
-                  if (login.isEmpty || password.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
-                    );
-                    return;
-                  }
-
-                  bool success = await AuthService.registerUser(login, password, company, phone, email);
-
-                  if (success) {
-                    print('Регистрация успешна для: $login');
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Пользователь с таким логином уже существует.')),
-                    );
-                  }
-                },
+                onPressed: _validateAndRegister,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: textOnPrimary,

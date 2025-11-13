@@ -16,22 +16,20 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late final TextEditingController _loginController;
   late final TextEditingController _companyController;
   late final TextEditingController _phoneController;
   late final TextEditingController _emailController;
-  late final TextEditingController _passwordController;
+  late final TextEditingController _addressController;
 
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loginController = TextEditingController();
     _companyController = TextEditingController();
     _phoneController = TextEditingController();
     _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+    _addressController = TextEditingController();
 
     _loadUserData();
   }
@@ -39,22 +37,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     try {
       Map<String, dynamic>? userData = await AuthService.getCurrentUser();
-      String? currentLogin = await AuthService.getUserLogin();
+      String? currentEmail = await AuthService.getUserEmail();
 
       if (userData != null) {
         setState(() {
-          _loginController.text = currentLogin ?? '';
           _companyController.text = userData['company'] ?? '';
           _phoneController.text = userData['phone'] ?? '';
-          _emailController.text = userData['email'] ?? '';
-          // _passwordController.text = userData['password'] ?? '';
+          _addressController.text = userData['address'] ?? ''; // ← добавлено
+          _emailController.text = currentEmail ?? '';
         });
-      } else {
-        if (currentLogin != null) {
-          setState(() {
-            _loginController.text = currentLogin;
-          });
-        }
       }
     } catch (e) {
       print('Ошибка при загрузке данных профиля: $e');
@@ -72,50 +63,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _saveProfile() async {
-    final newCompany = _companyController.text;
-    final newPhone = _phoneController.text;
-    final newEmail = _emailController.text;
-    final newPassword = _passwordController.text;
-
-    if (newCompany.isEmpty || newPhone.isEmpty || newEmail.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Пожалуйста, заполните все поля (Название фирмы, Телефон, Почта).')),
-        );
-      }
-      return;
-    }
-
-    bool success = await AuthService.updateUser(
-      newCompany.isEmpty ? null : newCompany,
-      newPhone.isEmpty ? null : newPhone,
-      newEmail.isEmpty ? null : newEmail,
-      newPassword.isEmpty ? null : newPassword,
-    );
-
-    if (success) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Профиль успешно обновлён!')),
-        );
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ошибка при сохранении профиля.')),
-        );
-      }
-    }
-  }
-
   @override
   void dispose() {
-    _loginController.dispose();
     _companyController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -142,74 +95,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const SizedBox(height: 40),
 
-              TextField(
-                controller: _loginController,
-                enabled: false,
-                decoration: InputDecoration(
-                  labelText: 'Логин',
-                  filled: true,
-                  fillColor: buttonBg,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-
+              // Название фирмы
               TextField(
                 controller: _companyController,
+                readOnly: true,
                 decoration: InputDecoration(
-                  labelText: 'Название фирмы',
+                  labelText: 'Название',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
+              // Телефон
               TextField(
                 controller: _phoneController,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(11),
-                  PhoneInputFormatter(),
-                ],
+                readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Телефон',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 20),
 
+              // Адрес компании
+              TextField(
+                controller: _addressController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Адрес',
+                  filled: true,
+                  fillColor: buttonBg,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Почта (логин)
               TextField(
                 controller: _emailController,
+                readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Почта',
                   filled: true,
                   fillColor: buttonBg,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Пароль (новый)',
-                  filled: true,
-                  fillColor: buttonBg,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-
+              // Договор/соглашение
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AgreementScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const AgreementScreen(),
+                    ),
                   );
                 },
                 child: Text(
@@ -222,30 +167,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
+              // Кнопка "Выйти"
               ElevatedButton(
-                onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: textOnPrimary,
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
-                child: const Text('Сохранить', style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(height: 10),
-
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  );
+                onPressed: () async {
+                  await AuthService.logout();
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
                   foregroundColor: textOnPrimary,
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 15,
+                  ),
                 ),
-                child: const Text('Выйти', style: TextStyle(color: Colors.white)),
+                child: const Text('Выйти',
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

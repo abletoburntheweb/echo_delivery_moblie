@@ -1,65 +1,47 @@
 // lib/utils/phone_input_formatter.dart
 import 'package:flutter/services.dart';
+import 'dart:math' show min;
 
 class PhoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final oldText = oldValue.text;
-    final newText = newValue.text;
-
-    if (newText.length < oldText.length) {
-      String digits = newText.replaceAll(RegExp(r'\D'), '');
-
-      if (digits.isEmpty) {
-        return newValue.copyWith(text: '', selection: TextSelection.collapsed(offset: 0));
-      }
-
-      return _formatDigits(digits, newValue);
+    // Разрешаем удаление без форматирования
+    if (newValue.text.length < oldValue.text.length) {
+      return newValue;
     }
 
-    String digits = newText.replaceAll(RegExp(r'\D'), '');
+    // Извлекаем только цифры
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
 
-    if (digits.length > 10) {
-      return oldValue;
-    }
-
-    return _formatDigits(digits, newValue);
-  }
-
-  TextEditingValue _formatDigits(String digits, TextEditingValue current) {
-    String formatted = '';
-
-    if (digits.startsWith('7') || digits.startsWith('8')) {
-      if (digits.length > 1) {
-        digits = digits.substring(1);
-      }
-      formatted = '+7 (';
+    // Обрабатываем: если первая цифра 8 или 7 — отбрасываем её (номер без кода страны)
+    String cleanDigits;
+    if (digits.startsWith('8') || digits.startsWith('7')) {
+      cleanDigits = digits.substring(1); // убираем первую 7/8
     } else {
-      formatted = '+7 (';
+      cleanDigits = digits;
     }
 
-    if (digits.length >= 3) {
-      formatted += digits.substring(0, 3) + ') ';
-      if (digits.length >= 6) {
-        formatted += digits.substring(3, 6) + '-';
-        if (digits.length >= 8) {
-          formatted += digits.substring(6, 8) + '-';
-          if (digits.length >= 10) {
-            formatted += digits.substring(8, 10);
-          } else {
-            formatted += digits.substring(8);
-          }
-        } else {
-          formatted += digits.substring(6);
-        }
-      } else {
-        formatted += digits.substring(3);
-      }
-    } else {
-      formatted += digits;
+    // Максимум 10 цифр номера (после +7)
+    if (cleanDigits.length > 10) {
+      cleanDigits = cleanDigits.substring(0, 10);
     }
 
-    return current.copyWith(
+    // Форматируем
+    String formatted = '+7';
+    if (cleanDigits.length > 0) {
+      formatted += ' (${cleanDigits.substring(0, min(cleanDigits.length, 3))}';
+    }
+    if (cleanDigits.length > 3) {
+      formatted += ') ${cleanDigits.substring(3, min(cleanDigits.length, 6))}';
+    }
+    if (cleanDigits.length > 6) {
+      formatted += '-${cleanDigits.substring(6, min(cleanDigits.length, 8))}';
+    }
+    if (cleanDigits.length > 8) {
+      formatted += '-${cleanDigits.substring(8)}';
+    }
+
+    return TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),
     );
