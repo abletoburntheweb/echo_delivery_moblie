@@ -67,9 +67,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return;
       }
 
-      print('🚀 Вызов API регистрации...');
+      print('🧠 Используем УМНУЮ регистрацию...');
 
-      final result = await AuthService.registerWithApi(
+      // ← ИСПРАВЬ НА УМНЫЙ МЕТОД
+      final result = await AuthService.smartRegister(
         company: company,
         phone: phone,
         email: email,
@@ -77,10 +78,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         address: address,
       );
 
-      print('🎉 Регистрация успешна: $result');
+      print('🎉 Умная регистрация завершена: $result');
+
+      final isLocalStorage = result['local_storage'] == true;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Регистрация успешна!')),
+        SnackBar(
+          content: Text(isLocalStorage
+              ? 'Регистрация успешна'
+              : 'Регистрация успешна'
+          ),
+          backgroundColor: isLocalStorage ? Colors.orange : Colors.green,
+        ),
       );
 
       Navigator.pushReplacement(
@@ -89,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
     } catch (e) {
-      print('💥 Ошибка регистрации: $e');
+      print('💥 Ошибка умной регистрации: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка регистрации: $e')),
       );

@@ -62,27 +62,36 @@ class LoginScreen extends StatelessWidget {
 
                     if (email.isEmpty || password.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Пожалуйста, введите email и пароль.'),
-                        ),
+                        const SnackBar(content: Text('Пожалуйста, введите email и пароль.')),
                       );
                       return;
                     }
 
                     try {
-                      print('🚀 Вызов API логина...');
+                      print('🧠 Используем УМНЫЙ вход...');
 
-                      final result = await AuthService.loginWithApi(email, password);
+                      final result = await AuthService.smartLogin(email, password);
 
-                      print('✅ Вход успешен для: $email');
-                      print('📊 Данные пользователя: $result');
+                      print('✅ Умный вход успешен: $email');
+
+                      final isLocalStorage = result['local_storage'] == true;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isLocalStorage
+                              ? 'Вход успешен'
+                              : 'Вход успешен'
+                          ),
+                          backgroundColor: isLocalStorage ? Colors.orange : Colors.green,
+                        ),
+                      );
 
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const CalendarScreen()),
                       );
                     } catch (e) {
-                      print('❌ Ошибка входа: $e');
+                      print('❌ Ошибка умного входа: $e');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Ошибка входа: $e')),
                       );
