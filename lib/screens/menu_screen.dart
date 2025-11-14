@@ -1,4 +1,3 @@
-// lib/screens/menu_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
@@ -28,7 +27,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Future<void> _loadMenu() async {
     try {
-      List<Dish> loadedDishes = await MenuService.loadMenuFromAssets();
+      List<Dish> loadedDishes = await MenuService.loadMenuFromApi();
       setState(() {
         _menuDishes = loadedDishes;
         _isLoading = false;
@@ -55,7 +54,6 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Возврат результата при системной кнопке "назад"
         Navigator.pop(context, _newlyAddedDish);
         return false;
       },
@@ -143,10 +141,7 @@ class _MenuScreenState extends State<MenuScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => DishDetailScreen(
-              name: dish.name,
-              description: dish.description,
-              price: dish.price,
-              imagePath: dish.imagePath,
+              dish: dish,
             ),
           ),
         );
@@ -181,9 +176,9 @@ class _MenuScreenState extends State<MenuScreen> {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: dish.imagePath != null
-                  ? Image.asset(
-                dish.imagePath!,
+              child: dish.image.isNotEmpty
+                  ? Image.network(
+                dish.fullImageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Center(
@@ -220,7 +215,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    dish.price,
+                    '${dish.price} ₽',
                     style: TextStyle(fontSize: 16, color: primaryColor),
                   ),
                 ],

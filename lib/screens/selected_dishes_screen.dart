@@ -1,4 +1,3 @@
-// lib/screens/selected_dishes_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
@@ -41,7 +40,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
 
   void _addDish(Dish dish) {
     setState(() {
-      int existingIndex = _selectedDishes.indexWhere((d) => d.name == dish.name);
+      int existingIndex = _selectedDishes.indexWhere((d) => d.id == dish.id);
 
       if (existingIndex != -1) {
         _selectedDishes[existingIndex] = _selectedDishes[existingIndex].copyWith(
@@ -55,7 +54,7 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
 
   void _removeDish(Dish dish) {
     setState(() {
-      int existingIndex = _selectedDishes.indexWhere((d) => d.name == dish.name);
+      int existingIndex = _selectedDishes.indexWhere((d) => d.id == dish.id);
 
       if (existingIndex != -1) {
         if (_selectedDishes[existingIndex].quantity > 1) {
@@ -67,6 +66,14 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
         }
       }
     });
+  }
+
+  double get _totalPrice {
+    double sum = 0.0;
+    for (var dish in _selectedDishes) {
+      sum += dish.price * dish.quantity;
+    }
+    return sum;
   }
 
   @override
@@ -89,7 +96,6 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Кнопка "Подтвердить" — переходим сразу на OrderConfirmationScreen
             Align(
               alignment: Alignment.topRight,
               child: GestureDetector(
@@ -131,7 +137,23 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
+
+            if (_selectedDishes.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Итого: ${_totalPrice.toStringAsFixed(2)} ₽',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            const SizedBox(height: 20),
 
             Expanded(
               child: _selectedDishes.isEmpty
@@ -148,11 +170,23 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
                 itemCount: _selectedDishes.length,
                 itemBuilder: (context, index) {
                   final dish = _selectedDishes[index];
+                  final itemTotal = dish.price * dish.quantity;
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: ListTile(
                       title: Text(dish.name),
-                      subtitle: Text(dish.price),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${dish.price} ₽ × ${dish.quantity}'),
+                          Text('${itemTotal.toStringAsFixed(2)} ₽',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -180,7 +214,6 @@ class _SelectedDishesScreenState extends State<SelectedDishesScreen> {
 
             const SizedBox(height: 20),
 
-            // Плавающая кнопка добавления новых блюд
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(

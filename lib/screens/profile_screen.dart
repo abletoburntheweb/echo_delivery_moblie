@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           _companyController.text = userData['company'] ?? '';
           _phoneController.text = userData['phone'] ?? '';
-          _addressController.text = userData['address'] ?? ''; // ← добавлено
+          _addressController.text = userData['address'] ?? '';
           _emailController.text = currentEmail ?? '';
         });
       }
@@ -95,7 +95,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const SizedBox(height: 40),
 
-              // Название фирмы
               TextField(
                 controller: _companyController,
                 readOnly: true,
@@ -108,7 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Телефон
               TextField(
                 controller: _phoneController,
                 readOnly: true,
@@ -121,7 +119,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Адрес компании
               TextField(
                 controller: _addressController,
                 readOnly: true,
@@ -134,7 +131,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Почта (логин)
               TextField(
                 controller: _emailController,
                 readOnly: true,
@@ -147,7 +143,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Договор/соглашение
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -167,7 +162,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Кнопка "Выйти"
               ElevatedButton(
                 onPressed: () async {
                   await AuthService.logout();

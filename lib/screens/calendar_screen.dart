@@ -18,7 +18,7 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? _selectedDate;
   late List<DateTime> _displayedDates;
-  List<String> _orderDates = []; // даты, на которые есть заказы
+  List<String> _orderDates = [];
 
   @override
   void initState() {
@@ -27,14 +27,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _loadOrderDates();
   }
 
-  /// Генерация 14 дней, начиная с понедельника следующей недели
   void _generateDates() {
     final now = DateTime.now();
     final nextMonday = now.add(Duration(days: (8 - now.weekday) % 7));
     _displayedDates = List.generate(14, (index) => nextMonday.add(Duration(days: index)));
   }
 
-  /// Загружаем даты заказов для подсветки
   Future<void> _loadOrderDates() async {
     final dates = await AuthService.getOrderDates();
     setState(() {
@@ -42,7 +40,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
-  /// Проверка, есть ли заказ на эту дату
   bool _hasOrder(DateTime date) {
     final strDate = DateFormat('yyyy-MM-dd').format(date);
     return _orderDates.contains(strDate);
@@ -52,7 +49,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Блокируем системную кнопку назад
         return false;
       },
       child: Scaffold(
@@ -65,8 +61,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
             context,
             MaterialPageRoute(builder: (context) => const ProfileScreen()),
           ),
-          showBackButton: false, // убираем стрелку назад
-          onBackPressed: () {}, // пустая функция
+          showBackButton: false,
+          onBackPressed: () {},
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -96,7 +92,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 selectedDate: _selectedDate!,
                               ),
                             ),
-                          ).then((_) => _loadOrderDates()); // обновляем даты после возврата
+                          ).then((_) => _loadOrderDates());
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Пожалуйста, выберите дату')),
@@ -117,7 +113,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Кнопка FAQ под календарём
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

@@ -1,17 +1,133 @@
 // lib/services/auth_service.dart
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../models/dish.dart';
 
 class AuthService {
+  static const String baseUrl = 'http://192.168.0.11:8000/api';
+
   static const String _prefsKeyUser = 'current_user';
   static const String _prefsKeyUsers = 'registered_users';
   static const String _prefsKeyUserEmail = 'current_user_email';
   static const String _prefsKeyUserOrders = 'user_order_dates';
-  static const String _prefsKeyUserDishes = 'user_order_dishes'; // блюда по дате
+  static const String _prefsKeyUserDishes = 'user_order_dishes';
 
-  /// Регистрация пользователя
+  static Future<void> testConnection() async {
+    try {
+      print('🔍 Тестируем подключение к API...');
+      print('🌐 URL: $baseUrl/dishes/');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/dishes/'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 5));
+
+      print('✅ Подключение работает! Status: ${response.statusCode}');
+      print('📄 Ответ: ${response.body.length} символов');
+    } catch (e) {
+      print('🔴 Нет подключения к API: $e');
+    }
+  }
+  static Future<Map<String, dynamic>> registerWithApi({
+    required String company,
+    required String phone,
+    required String email,
+    required String password,
+    required String address,
+  }) async {
+    try {
+      print('🔄 === НАЧАЛО РЕГИСТРАЦИИ ===');
+
+      final requestData = {
+        'username': email,
+        'email': email,
+        'password': password,
+        'company_name': company,
+        'phone': phone,
+        'address': address,
+      };
+
+      print('📦 Request data: $requestData');
+      print('🌐 URL: $baseUrl/auth/register/');
+      print('📤 Method: POST');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register/'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestData),
+      ).timeout(const Duration(seconds: 10));
+
+      print('📡 Response status: ${response.statusCode}');
+      print('📡 Response body: ${response.body}');
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        print('✅ === РЕГИСТРАЦИЯ УСПЕШНА ===');
+        return data;
+      } else {
+        final errorData = json.decode(response.body);
+        final errorMessage = errorData['error'] ?? errorData['detail'] ?? 'Ошибка регистрации';
+        print('❌ === ОШИБКА РЕГИСТРАЦИИ ===: $errorMessage');
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print('🔴 === КРИТИЧЕСКАЯ ОШИБКА ===: $e');
+      throw Exception('Ошибка подключения: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> loginWithApi(String email, String password) async {
+    try {
+      print('🔄 Логин через API: $email');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login/'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      print('📡 API Response status: ${response.statusCode}');
+      print('📡 API Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_prefsKeyUser, json.encode(data));
+        await prefs.setString(_prefsKeyUserEmail, email);
+
+        print('✅ Логин успешен: $email');
+        return data;
+      } else {
+        final errorData = json.decode(response.body);
+        final errorMessage = errorData['error'] ?? errorData['detail'] ?? 'Ошибка входа';
+        print('❌ Ошибка логина: $errorMessage');
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print('🔴 Ошибка подключения при логине: $e');
+      throw Exception('Ошибка подключения: $e');
+    }
+  }
+
+  static Future<bool> checkApiConnection() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/dishes/'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('🔴 Нет подключения к API: $e');
+      return false;
+    }
+  }
+
   static Future<bool> registerUser(
       String password, String company, String phone, String email,
       {String? address}) async {
@@ -36,7 +152,6 @@ class AuthService {
     return true;
   }
 
-  /// Авторизация
   static Future<bool> loginUser(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final usersJson = prefs.getString(_prefsKeyUsers);
@@ -52,6 +167,7 @@ class AuthService {
 
     return false;
   }
+
 
   static Future<bool> isUserLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
@@ -111,7 +227,7 @@ class AuthService {
     return true;
   }
 
-  /// Сохранение даты заказа (без дубликатов)
+
   static Future<void> addOrderDate(DateTime date) async {
     final prefs = await SharedPreferences.getInstance();
     final strDate = DateFormat('yyyy-MM-dd').format(date);
@@ -163,7 +279,6 @@ class AuthService {
     }
   }
 
-  /// Сохраняем блюда для даты
   static Future<void> saveDishesForDate(DateTime date, List<Dish> dishes) async {
     final prefs = await SharedPreferences.getInstance();
     final strDate = DateFormat('yyyy-MM-dd').format(date);
@@ -181,11 +296,9 @@ class AuthService {
     allDishes[strDate] = dishes.map((d) => d.toJson()).toList();
     await prefs.setString(_prefsKeyUserDishes, json.encode(allDishes));
 
-    // Автоматически добавляем дату в список заказов
     await addOrderDate(date);
   }
 
-  /// Получаем блюда для даты
   static Future<List<Dish>> getDishesForDate(DateTime date) async {
     final prefs = await SharedPreferences.getInstance();
     final strDate = DateFormat('yyyy-MM-dd').format(date);
@@ -230,5 +343,52 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_prefsKeyUser);
     await prefs.remove(_prefsKeyUserEmail);
+  }
+
+  static Future<Map<String, dynamic>> smartLogin(String email, String password) async {
+    try {
+      if (await checkApiConnection()) {
+        return await loginWithApi(email, password);
+      } else {
+        final success = await loginUser(email, password);
+        if (success) {
+          final user = await getCurrentUser();
+          return user ?? {'message': 'Локальный вход успешен'};
+        } else {
+          throw Exception('Неверный email или пароль');
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>> smartRegister({
+    required String company,
+    required String phone,
+    required String email,
+    required String password,
+    required String address,
+  }) async {
+    try {
+      if (await checkApiConnection()) {
+        return await registerWithApi(
+          company: company,
+          phone: phone,
+          email: email,
+          password: password,
+          address: address,
+        );
+      } else {
+        final success = await registerUser(password, company, phone, email, address: address);
+        if (success) {
+          return {'message': 'Локальная регистрация успешна'};
+        } else {
+          throw Exception('Пользователь с таким email уже существует');
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }

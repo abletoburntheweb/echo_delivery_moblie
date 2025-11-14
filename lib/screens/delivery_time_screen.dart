@@ -1,4 +1,3 @@
-// lib/screens/delivery_time_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/order_confirmation_screen.dart';
 import 'package:intl/intl.dart';
@@ -39,8 +38,7 @@ class DeliveryTimeScreen extends StatelessWidget {
 
     double totalPrice = 0.0;
     for (var dish in selectedDishes) {
-      final unitPrice = double.tryParse(dish.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
-      totalPrice += unitPrice * dish.quantity;
+      totalPrice += dish.price * dish.quantity;
     }
 
     return Scaffold(
@@ -69,8 +67,7 @@ class DeliveryTimeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   ...selectedDishes.map((dish) {
-                    final unitPrice = double.tryParse(dish.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
-                    final itemTotal = unitPrice * dish.quantity;
+                    final itemTotal = dish.price * dish.quantity;
                     return ListTile(
                       title: Text(dish.name),
                       subtitle: Text('Количество: ${dish.quantity}'),
@@ -89,16 +86,14 @@ class DeliveryTimeScreen extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () async {
-                        // Сохраняем блюда для даты и автоматически добавляем дату в заказы
                         await AuthService.saveDishesForDate(selectedDate!, selectedDishes);
 
-                        // Переходим к экрану подтверждения заказа
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => OrderConfirmationScreen(
-                              selectedDate: selectedDate!,
-                              selectedDishes: selectedDishes),
+                                selectedDate: selectedDate!,
+                                selectedDishes: selectedDishes),
                           ),
                         );
                       },

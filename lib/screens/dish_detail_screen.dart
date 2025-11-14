@@ -1,4 +1,3 @@
-// lib/screens/dish_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
@@ -7,17 +6,11 @@ import '../utils/colors.dart';
 import '../models/dish.dart';
 
 class DishDetailScreen extends StatefulWidget {
-  final String name;
-  final String description;
-  final String price;
-  final String? imagePath;
+  final Dish dish;
 
   const DishDetailScreen({
     super.key,
-    required this.name,
-    required this.description,
-    required this.price,
-    this.imagePath,
+    required this.dish,
   });
 
   @override
@@ -56,14 +49,14 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.grey.shade400),
                 ),
-                child: widget.imagePath != null
-                    ? Image.asset(
-                  widget.imagePath!,
+                child: widget.dish.image.isNotEmpty
+                    ? Image.network(
+                  widget.dish.fullImageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Center(
                       child: Text(
-                        widget.name[0],
+                        widget.dish.name[0],
                         style: TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
@@ -75,7 +68,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                 )
                     : Center(
                   child: Text(
-                    widget.name[0],
+                    widget.dish.name[0],
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
@@ -87,13 +80,13 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
               const SizedBox(height: 20),
 
               Text(
-                widget.name,
+                widget.dish.name,
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
 
               Text(
-                widget.description,
+                widget.dish.description,
                 style: const TextStyle(fontSize: 16, height: 1.5),
               ),
               const SizedBox(height: 30),
@@ -104,11 +97,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                     flex: 3,
                     child: ElevatedButton(
                       onPressed: () {
-                        final selectedDish = Dish(
-                          name: widget.name,
-                          description: widget.description,
-                          price: widget.price,
-                          imagePath: widget.imagePath,
+                        final selectedDish = widget.dish.copyWith(
                           quantity: _quantity,
                         );
 

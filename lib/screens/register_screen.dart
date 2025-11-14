@@ -20,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final addressController = TextEditingController();
-  bool _acceptedPrivacy = false; // Флаг согласия на обработку данных
+  bool _acceptedPrivacy = false;
 
   @override
   void dispose() {
@@ -39,46 +39,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _validateAndRegister() async {
-    final address = addressController.text.trim();
-    final company = companyController.text.trim();
-    final phone = phoneController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    try {
+      final address = addressController.text.trim();
+      final company = companyController.text.trim();
+      final phone = phoneController.text.trim();
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
 
-    if (address.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
+      if (address.isEmpty || company.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Пожалуйста, заполните все поля.')),
+        );
+        return;
+      }
+
+      if (!_isEmailValid(email)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Пожалуйста, введите корректный адрес почты.')),
+        );
+        return;
+      }
+
+      if (!_acceptedPrivacy) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Вы должны согласиться на обработку персональных данных.')),
+        );
+        return;
+      }
+
+      print('🚀 Вызов API регистрации...');
+
+      final result = await AuthService.registerWithApi(
+        company: company,
+        phone: phone,
+        email: email,
+        password: password,
+        address: address,
       );
-      return;
-    }
 
-    if (!_isEmailValid(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, введите корректный адрес почты.')),
-      );
-      return;
-    }
+      print('🎉 Регистрация успешна: $result');
 
-    if (!_acceptedPrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Вы должны согласиться на обработку персональных данных.')),
-      );
-      return;
-    }
-
-    bool success = await AuthService.registerUser(password, company, phone, email, address: address);
-
-    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Регистрация успешна!')),
       );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
-    } else {
+
+    } catch (e) {
+      print('💥 Ошибка регистрации: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пользователь с таким email уже существует.')),
+        SnackBar(content: Text('Ошибка регистрации: $e')),
       );
     }
   }
@@ -126,12 +139,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: phoneController,
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(18),
+                  LengthLimitingTextInputFormatter(16),
                   PhoneInputFormatter(),
                 ],
                 decoration: InputDecoration(
-                  labelText: '+7 (___) ___-__-__',
-                  hintText: '+7 (___) ___-__-__',
+                  labelText: '+7(___)___-__-__',
+                  hintText: '+7(___)___-__-__',
                   filled: true,
                   fillColor: buttonBg,
                   border: const OutlineInputBorder(),
@@ -166,7 +179,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Чекбокс согласия на обработку данных
               Row(
                 children: [
                   Checkbox(

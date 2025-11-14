@@ -1,49 +1,66 @@
 // lib/utils/phone_input_formatter.dart
 import 'package:flutter/services.dart';
-import 'dart:math' show min;
 
 class PhoneInputFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    // Разрешаем удаление без форматирования
-    if (newValue.text.length < oldValue.text.length) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    final newText = newValue.text;
+
+    if (newText.isEmpty) {
       return newValue;
     }
 
-    // Извлекаем только цифры
-    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final digitsOnly = newText.replaceAll(RegExp(r'[^\d]'), '');
 
-    // Обрабатываем: если первая цифра 8 или 7 — отбрасываем её (номер без кода страны)
-    String cleanDigits;
-    if (digits.startsWith('8') || digits.startsWith('7')) {
-      cleanDigits = digits.substring(1); // убираем первую 7/8
-    } else {
-      cleanDigits = digits;
-    }
+    final limitedDigits = digitsOnly.length > 11 ? digitsOnly.substring(0, 11) : digitsOnly;
 
-    // Максимум 10 цифр номера (после +7)
-    if (cleanDigits.length > 10) {
-      cleanDigits = cleanDigits.substring(0, 10);
+    String formatted = limitedDigits;
+
+    if (formatted.isNotEmpty) {
+      if (formatted.startsWith('8')) {
+        formatted = '7${formatted.substring(1)}';
+      } else if (!formatted.startsWith('7')) {
+        formatted = '7$formatted';
+      }
     }
 
-    // Форматируем
-    String formatted = '+7';
-    if (cleanDigits.length > 0) {
-      formatted += ' (${cleanDigits.substring(0, min(cleanDigits.length, 3))}';
+    final buffer = StringBuffer();
+    buffer.write('+7');
+
+    if (formatted.length > 1) {
+      final number = formatted.substring(1);
+
+      if (number.isNotEmpty) {
+        final part1 = number.length >= 3 ? number.substring(0, 3) : number;
+        buffer.write('($part1');
+
+        if (number.length > 3) {
+          final part2 = number.length >= 6 ? number.substring(3, 6) : number.substring(3);
+          buffer.write(')$part2');
+
+          if (number.length > 6) {
+            final part3 = number.length >= 8 ? number.substring(6, 8) : number.substring(6);
+            buffer.write('-$part3');
+
+            if (number.length > 8) {
+              final part4 = number.substring(8);
+              buffer.write('-$part4');
+            }
+          }
+        } else {
+          buffer.write(')');
+        }
+      }
     }
-    if (cleanDigits.length > 3) {
-      formatted += ') ${cleanDigits.substring(3, min(cleanDigits.length, 6))}';
-    }
-    if (cleanDigits.length > 6) {
-      formatted += '-${cleanDigits.substring(6, min(cleanDigits.length, 8))}';
-    }
-    if (cleanDigits.length > 8) {
-      formatted += '-${cleanDigits.substring(8)}';
-    }
+
+    final formattedText = buffer.toString();
 
     return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }

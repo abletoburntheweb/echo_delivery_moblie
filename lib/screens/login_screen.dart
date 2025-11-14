@@ -69,30 +69,31 @@ class LoginScreen extends StatelessWidget {
                       return;
                     }
 
-                    bool success = await AuthService.loginUser(email, password);
+                    try {
+                      print('🚀 Вызов API логина...');
 
-                    if (success) {
-                      print('Вход успешен для: $email');
+                      final result = await AuthService.loginWithApi(email, password);
+
+                      print('✅ Вход успешен для: $email');
+                      print('📊 Данные пользователя: $result');
+
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const CalendarScreen()),
+                        MaterialPageRoute(builder: (context) => const CalendarScreen()),
                       );
-                    } else {
+                    } catch (e) {
+                      print('❌ Ошибка входа: $e');
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Неверный email или пароль.')),
+                        SnackBar(content: Text('Ошибка входа: $e')),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: textOnPrimary,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
-                  child:
-                  const Text('Войти', style: TextStyle(color: Colors.white)),
+                  child: const Text('Войти', style: TextStyle(color: Colors.white)),
                 ),
                 const SizedBox(height: 10),
 

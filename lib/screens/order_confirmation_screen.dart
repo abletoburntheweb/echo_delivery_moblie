@@ -1,4 +1,3 @@
-// lib/screens/order_confirmation_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
 import '../widgets/common_app_bar.dart';
@@ -32,8 +31,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   double get totalPrice {
     double sum = 0.0;
     for (var dish in widget.selectedDishes) {
-      final price = double.tryParse(dish.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
-      sum += price * dish.quantity;
+      sum += dish.price * dish.quantity;
     }
     return sum;
   }
@@ -88,13 +86,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
       return;
     }
 
-    // Сохраняем дату и блюда через AuthService
     await AuthService.saveDishesForDate(widget.selectedDate, widget.selectedDishes);
 
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Заказ успешно оформлен!')));
 
-    // Возврат на календарь
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const CalendarScreen()),
@@ -126,10 +122,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Список блюд
             ...widget.selectedDishes.map((dish) {
-              final unitPrice = double.tryParse(dish.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
-              final total = unitPrice * dish.quantity;
+              final total = dish.price * dish.quantity;
               return ListTile(
                 title: Text(dish.name),
                 subtitle: Text('Количество: ${dish.quantity}'),
@@ -148,7 +142,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             ),
             const SizedBox(height: 30),
 
-            // Адрес
             const Text('Адрес доставки', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             TextField(
@@ -161,7 +154,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Время
             const Text('Выберите время доставки', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             DropdownButtonFormField<String>(
@@ -197,7 +189,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
-                child: const Text('Подвердить'),
+                child: const Text('Подтвердить'),
               ),
             ),
           ],
