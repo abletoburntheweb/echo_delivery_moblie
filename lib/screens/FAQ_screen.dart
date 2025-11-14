@@ -41,7 +41,25 @@ class FAQScreen extends StatelessWidget {
                       question: 'Есть ли у нас сертификаты?',
                       answer: 'Конечно же у нас все есть. Ну в самом деле, кто бы нам разрешил еду продавать тогда?',
                     ),
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 20),
+
+                    _buildQuestionAnswer(
+                      question: 'Как сделать заказ?',
+                      answer: 'Выберите дату в календаре, добавьте блюда в корзину, нажмите "Время", затем "Согласовать".',
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildQuestionAnswer(
+                      question: 'Можно ли отменить заказ?',
+                      answer: 'Да, если заказ ещё не был передан на приготовление — вы можете отменить его в течение 2 часов.',
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildQuestionAnswer(
+                      question: 'Какие способы оплаты?',
+                      answer: 'Оплата наличными при получении, переводом на карту или через QR-код.',
+                    ),
+                    const SizedBox(height: 150),
                   ],
                 ),
               ),
