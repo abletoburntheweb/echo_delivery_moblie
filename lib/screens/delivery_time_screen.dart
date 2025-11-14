@@ -3,7 +3,6 @@ import 'package:flutterprojects/screens/order_confirmation_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/colors.dart';
-import '../services/auth_service.dart';
 import '../models/dish.dart';
 
 class DeliveryTimeScreen extends StatelessWidget {
@@ -85,9 +84,8 @@ class DeliveryTimeScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () async {
-                        await AuthService.saveDishesForDate(selectedDate!, selectedDishes);
-
+                      onPressed: () {
+                        // Просто переходим на следующий экран - сохранение будет в OrderConfirmationScreen через API
                         Navigator.push(
                           context,
                           MaterialPageRoute(

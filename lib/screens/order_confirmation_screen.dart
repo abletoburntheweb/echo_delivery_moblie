@@ -25,6 +25,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   final TextEditingController _addressController = TextEditingController();
   String? _selectedTime;
   bool _termsAgreement = false;
+  bool _isSubmitting = false;
 
   final List<String> _timeOptions = [];
 
@@ -71,31 +72,60 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
   Future<void> _confirmOrder() async {
     if (_addressController.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Введите адрес доставки')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Введите адрес доставки')));
       return;
     }
     if (_selectedTime == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Выберите время доставки')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Выберите время доставки')));
       return;
     }
     if (!_termsAgreement) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Подтвердите согласие')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Подтвердите согласие')));
       return;
     }
 
-    await AuthService.saveDishesForDate(widget.selectedDate, widget.selectedDishes);
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Заказ успешно оформлен!')));
+    try {
+      print('🌐 Отправляем заказ в Django API...');
+      await AuthService.saveOrder(
+        deliveryDate: widget.selectedDate,
+        deliveryTime: _selectedTime!,
+        deliveryAddress: _addressController.text,
+        dishes: widget.selectedDishes,
+      );
+      print('✅ Заказ успешно создан в БД');
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const CalendarScreen()),
-          (route) => false,
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Заказ успешно оформлен на ${DateFormat('dd.MM.yyyy').format(widget.selectedDate)}!'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const CalendarScreen()),
+            (route) => false,
+      );
+    } catch (e) {
+      print('💥 Ошибка при оформлении заказа: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ошибка при оформлении заказа: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
 
   @override
@@ -111,7 +141,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: SingleChildScrollView(
+      body: _isSubmitting
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

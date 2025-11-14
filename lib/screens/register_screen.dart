@@ -69,7 +69,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       print('🧠 Используем УМНУЮ регистрацию...');
 
-      // ← ИСПРАВЬ НА УМНЫЙ МЕТОД
       final result = await AuthService.smartRegister(
         company: company,
         phone: phone,

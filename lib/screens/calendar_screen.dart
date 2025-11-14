@@ -19,6 +19,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? _selectedDate;
   late List<DateTime> _displayedDates;
   List<String> _orderDates = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -34,15 +35,94 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Future<void> _loadOrderDates() async {
-    final dates = await AuthService.getOrderDates();
-    setState(() {
-      _orderDates = dates;
-    });
+    try {
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+
+      print('🔄 Загрузка дат заказов...');
+
+      // Всегда загружаем свежие данные из API
+      final apiDates = await AuthService.getOrderDates();
+
+      if (mounted) {
+        setState(() {
+          _orderDates = apiDates;
+          _isLoading = false;
+        });
+      }
+
+      print('✅ Заказы из API: ${apiDates.length} дат');
+
+    } catch (e) {
+      print('❌ Ошибка загрузки заказов: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+
+      // Показываем ошибку пользователю
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка загрузки заказов: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   bool _hasOrder(DateTime date) {
     final strDate = DateFormat('yyyy-MM-dd').format(date);
     return _orderDates.contains(strDate);
+  }
+
+  void _onDateSelected(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+  }
+
+  void _navigateToSelectedDishes() {
+    if (_selectedDate != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SelectedDishesScreen(
+            selectedDate: _selectedDate!,
+          ),
+        ),
+      ).then((_) {
+        // Обновляем заказы после возврата с экрана заказа
+        _loadOrderDates();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Пожалуйста, выберите дату'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _navigateToFAQ() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FAQScreen()),
+    );
+  }
+
+  void _navigateToProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    );
   }
 
   @override
@@ -57,10 +137,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           titleColor: textOnPrimary,
           backgroundColor: primaryColor,
           showProfileButton: true,
-          onProfilePressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfileScreen()),
-          ),
+          onProfilePressed: _navigateToProfile,
           showBackButton: false,
           onBackPressed: () {},
         ),
@@ -80,25 +157,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   children: [
                     _buildWeekdayHeader(),
                     const SizedBox(height: 10),
-                    Expanded(child: _buildCalendarGrid(context)),
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : _buildCalendarGrid(context),
+                    ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () {
-                        if (_selectedDate != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SelectedDishesScreen(
-                                selectedDate: _selectedDate!,
-                              ),
-                            ),
-                          ).then((_) => _loadOrderDates());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Пожалуйста, выберите дату')),
-                          );
-                        }
-                      },
+                      onPressed: _navigateToSelectedDishes,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonBg,
                         foregroundColor: buttonText,
@@ -114,12 +184,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FAQScreen()),
-                  );
-                },
+                onPressed: _navigateToFAQ,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: textOnPrimary,
@@ -130,6 +195,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 child: const Text('FAQ', style: TextStyle(fontSize: 18)),
               ),
+              // Кнопка "Обновить заказы" УБРАНА
             ],
           ),
         ),
@@ -144,7 +210,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       children: weekdays
           .map((day) => Text(
         day,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
       ))
           .toList(),
     );
@@ -154,6 +224,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final firstDayWeekday = _displayedDates.first.weekday;
     final List<DateTime?> paddedDates = [];
 
+    // Добавляем пустые ячейки для выравнивания
     for (int i = 1; i < firstDayWeekday; i++) {
       paddedDates.add(null);
     }
@@ -170,7 +241,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       itemBuilder: (context, index) {
         final date = paddedDates[index];
-        if (date == null) return Container();
+        if (date == null) return const SizedBox.shrink();
 
         final isSelected = _selectedDate != null &&
             date.year == _selectedDate!.year &&
@@ -178,9 +249,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
             date.day == _selectedDate!.day;
 
         final hasOrder = _hasOrder(date);
+        final isToday = _isToday(date);
 
         return GestureDetector(
-          onTap: () => setState(() => _selectedDate = date),
+          onTap: () => _onDateSelected(date),
           child: Container(
             decoration: BoxDecoration(
               color: isSelected
@@ -188,22 +260,43 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   : hasOrder
                   ? Colors.orangeAccent
                   : Colors.transparent,
-              border: Border.all(color: textOnPrimary),
+              border: Border.all(
+                color: isToday ? Colors.yellow : textOnPrimary,
+                width: isToday ? 2 : 1,
+              ),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Center(
-              child: Text(
-                '${date.day}',
-                style: TextStyle(
-                  color: isSelected ? textOnSecondary : textOnPrimary,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 20,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${date.day}',
+                    style: TextStyle(
+                      color: isSelected ? buttonText : textOnPrimary,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 16,
+                    ),
+                  ),
+                  if (hasOrder)
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      width: 6,
+                      height: 6,
+                    ),
+                ],
               ),
             ),
           ),
         );
       },
     );
+  }
+
+  bool _isToday(DateTime date) {
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 }
