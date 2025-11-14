@@ -39,13 +39,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Map<String, dynamic>? userData = await AuthService.getCurrentUser();
       String? currentEmail = await AuthService.getUserEmail();
 
+      print('🔍 Данные пользователя из AuthService:');
+      print('userData: $userData');
+      print('currentEmail: $currentEmail');
+
       if (userData != null) {
         setState(() {
-          _companyController.text = userData['company'] ?? '';
+          // Пробуем разные возможные ключи
+          _companyController.text = userData['company'] ??
+              userData['company_name'] ??
+              userData['name'] ?? '';
           _phoneController.text = userData['phone'] ?? '';
           _addressController.text = userData['address'] ?? '';
-          _emailController.text = currentEmail ?? '';
+          _emailController.text = currentEmail ??
+              userData['email'] ?? '';
         });
+
+        print('📝 Заполненные данные:');
+        print('Компания: ${_companyController.text}');
+        print('Телефон: ${_phoneController.text}');
+        print('Адрес: ${_addressController.text}');
+        print('Email: ${_emailController.text}');
+      } else {
+        print('❌ userData is null');
       }
     } catch (e) {
       print('Ошибка при загрузке данных профиля: $e');
