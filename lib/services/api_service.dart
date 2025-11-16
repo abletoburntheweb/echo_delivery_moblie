@@ -61,7 +61,31 @@ class ApiService {
       throw Exception('Failed to load dishes by category: $e');
     }
   }
+  static Future<Map<String, dynamic>> getSiteStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/site/status/'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'site_available': true,
+          'site_blocked': false,
+          'maintenance_mode': false
+        };
+      }
+    } catch (e) {
+      print('Error getting site status: $e');
+      return {
+        'site_available': true,
+        'site_blocked': false,
+        'maintenance_mode': false
+      };
+    }
+  }
   static Future<List<dynamic>> getCategories() async {
     try {
       final headers = await _getHeaders();

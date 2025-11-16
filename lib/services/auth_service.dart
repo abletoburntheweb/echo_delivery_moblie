@@ -311,7 +311,6 @@ class AuthService {
   }
 
   static Future<List<Dish>> getDishesForDate(DateTime date) async {
-    // TODO: Реализовать получение блюд для конкретной даты из БД
     print('⚠️ Получение блюд для даты еще не реализовано');
     return [];
   }

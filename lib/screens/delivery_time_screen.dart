@@ -85,7 +85,6 @@ class DeliveryTimeScreen extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Просто переходим на следующий экран - сохранение будет в OrderConfirmationScreen через API
                         Navigator.push(
                           context,
                           MaterialPageRoute(

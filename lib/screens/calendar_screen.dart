@@ -1,4 +1,3 @@
-// lib/screens/calendar_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/screens/selected_dishes_screen.dart';
 import 'package:flutterprojects/screens/profile_screen.dart';
@@ -7,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../widgets/common_app_bar.dart';
 import '../utils/colors.dart';
 import '../services/auth_service.dart';
+import '../services/api_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -20,12 +20,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
   late List<DateTime> _displayedDates;
   List<String> _orderDates = [];
   bool _isLoading = false;
+  bool _maintenanceMode = false;
+  String _maintenanceText = '';
 
   @override
   void initState() {
     super.initState();
     _generateDates();
+    _checkSiteStatus();
     _loadOrderDates();
+  }
+
+  Future<void> _checkSiteStatus() async {
+    try {
+      final status = await ApiService.getSiteStatus();
+
+      setState(() {
+        _maintenanceMode = status['maintenance_mode'] ?? false;
+        _maintenanceText = status['maintenance_dates']?['display_text'] ?? '';
+      });
+    } catch (e) {
+      print('❌ Ошибка проверки статуса сайта: $e');
+    }
   }
 
   void _generateDates() {
@@ -44,7 +60,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
       print('🔄 Загрузка дат заказов...');
 
-      // Всегда загружаем свежие данные из API
       final apiDates = await AuthService.getOrderDates();
 
       if (mounted) {
@@ -64,7 +79,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         });
       }
 
-      // Показываем ошибку пользователю
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -98,14 +112,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ),
       ).then((_) {
-        // Обновляем заказы после возврата с экрана заказа
         _loadOrderDates();
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Пожалуйста, выберите дату'),
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
     }
@@ -145,6 +158,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
+              // Только информационное сообщение о тех работах (если есть)
+              if (_maintenanceMode && _maintenanceText.isNotEmpty) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    border: Border.all(color: Colors.orange),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.orange),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _maintenanceText,
+                          style: const TextStyle(color: Colors.orange),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 10),
               Container(
                 height: 300,
@@ -195,7 +234,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 child: const Text('FAQ', style: TextStyle(fontSize: 18)),
               ),
-              // Кнопка "Обновить заказы" УБРАНА
             ],
           ),
         ),
@@ -224,7 +262,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final firstDayWeekday = _displayedDates.first.weekday;
     final List<DateTime?> paddedDates = [];
 
-    // Добавляем пустые ячейки для выравнивания
     for (int i = 1; i < firstDayWeekday; i++) {
       paddedDates.add(null);
     }
