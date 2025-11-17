@@ -33,7 +33,7 @@ class _MenuScreenState extends State<MenuScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Ошибка при загрузке меню: $e');
+      print('❌ Ошибка при загрузке меню: $e');
       setState(() {
         _isLoading = false;
       });
@@ -135,6 +135,9 @@ class _MenuScreenState extends State<MenuScreen> {
     required BuildContext context,
     required Dish dish,
   }) {
+    print('🖼️ Dish Image Path: ${dish.image}');
+    print('🌐 Full Image URL: ${dish.fullImageUrl}');
+
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.push(
@@ -181,6 +184,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 dish.fullImageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
+                  print('🔴 Ошибка загрузки фото: ${dish.fullImageUrl}, ошибка: $error');
                   return Center(
                     child: Text(
                       dish.name[0],
@@ -191,6 +195,10 @@ class _MenuScreenState extends State<MenuScreen> {
                       ),
                     ),
                   );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(child: CircularProgressIndicator());
                 },
               )
                   : Center(

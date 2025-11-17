@@ -65,7 +65,7 @@ class Dish {
   String get fullImageUrl {
     if (image.isEmpty) return '';
     if (image.startsWith('http')) return image;
-    return 'http://10.0.2.2:8000/media/$image';
+    return 'http://192.168.0.11:8000/media/$image';
   }
 
   Dish copyWith({
